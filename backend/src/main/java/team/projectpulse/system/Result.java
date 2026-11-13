@@ -15,10 +15,6 @@ public class Result {
     private Object data; // The response payload
 
 
-    public Result() {
-        // no caller in this codebase (controllers use the argument constructors); kept as the bean default constructor beside the setters
-    }
-
     public Result(boolean flag, Integer code, String message) {
         this.flag = flag;
         this.code = code;

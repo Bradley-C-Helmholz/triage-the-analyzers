@@ -13,11 +13,14 @@
      WeeklyPeerEvaluationReport, DocumentTemplate and MyUserPrincipal. -->
 <FindBugsFilter>
     <!-- (a) JPA entities (every @Entity class in team.projectpulse).
-         Entities expose their associations by design. Callers mutate collections through getters
-         (Course.java:96/101, Section.java:149/163, Team.java:98/104, TeamService.java:183-197,
-         UseCaseService.java:205-212), and many collections use orphanRemoval = true, which requires
-         Hibernate to see changes on the same managed collection instance. Defensive copies would
-         make those calls silently do nothing or break orphan removal. -->
+         Entities expose their associations by design. Callers mutate collections through getters:
+         Course.addInstructor/removeInstructor, Section.addInstructor/removeInstructor and
+         Team.addInstructor/removeInstructor (each changes instructor.getCourses(), getSections() or
+         getTeams()), TeamService.transferTeam/transferStudent (from/to getTeams() and getStudents()),
+         and UseCaseService.updateUseCase (clear() then addAll() on getSecondaryActors(),
+         getPreconditions() and getPostconditions()). Many collections also use orphanRemoval = true,
+         which requires Hibernate to see changes on the same managed collection instance. Defensive
+         copies would make those calls silently do nothing or break orphan removal. -->
     <Match>
         <Class name="~^team\.projectpulse\.(activity\.Activity|course\.Course|evaluation\.PeerEvaluation|evaluation\.Rating|instructor\.Instructor|ram\.collaboration\.Comment|ram\.collaboration\.CommentThread|ram\.document\.DocumentSection|ram\.document\.DocumentSectionLock|ram\.document\.RequirementDocument|ram\.requirement\.ArtifactKeySequence|ram\.requirement\.ArtifactLink|ram\.requirement\.RequirementArtifact|ram\.usecase\.UseCase|ram\.usecase\.UseCaseExtension|ram\.usecase\.UseCaseExtensionStep|ram\.usecase\.UseCaseLock|ram\.usecase\.UseCaseMainStep|rubric\.Criterion|rubric\.Rubric|section\.Section|student\.Student|team\.Team|user\.PeerEvaluationUser|user\.resetpassword\.ResetPasswordToken|user\.userinvitation\.UserInvitation)$"/>
         <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
