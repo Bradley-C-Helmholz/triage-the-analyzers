@@ -13,5 +13,22 @@
          xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
     <description>PMD quickstart, with Project Pulse's decisions.</description>
     <rule ref="rulesets/java/quickstart.xml">
+        <!-- UnnecessaryConstructor: 8 of the 10 findings are explicit no-arg constructors on @Entity
+             classes. Keeping them explicit documents the JPA requirement: if the constructor is
+             deleted and another constructor is later added, Java stops generating the default and
+             Hibernate can no longer instantiate the entity. -->
+        <exclude name="UnnecessaryConstructor"/>
+        <!-- GuardLogStatement is excluded here and re-added below, limited to trace and debug. -->
+        <exclude name="GuardLogStatement"/>
+    </rule>
+    <!-- GuardLogStatement, narrowed to trace and debug. No logging level is configured in any
+         application*.yml, so Spring Boot defaults to INFO. info/warn/error calls are always
+         enabled, so a guard saves nothing; the rule only pays off for trace/debug, which are
+         disabled by default. PMD requires one guard method per level, in the same order. -->
+    <rule ref="category/java/bestpractices.xml/GuardLogStatement">
+        <properties>
+            <property name="logLevels" value="trace,debug"/>
+            <property name="guardsMethods" value="isTraceEnabled,isDebugEnabled"/>
+        </properties>
     </rule>
 </ruleset>

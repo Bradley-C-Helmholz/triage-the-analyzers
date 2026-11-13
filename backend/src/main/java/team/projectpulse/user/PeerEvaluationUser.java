@@ -34,6 +34,7 @@ public abstract class PeerEvaluationUser {
 
 
     public PeerEvaluationUser() {
+        // required by JPA; the Student and Instructor entity subclasses chain to it
     }
 
     public PeerEvaluationUser(String username, String firstName, String lastName, String email, String password, boolean enabled, String roles) {

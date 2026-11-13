@@ -56,7 +56,7 @@ public class UseCaseExtension {
 
 
     public UseCaseExtension() {
-
+        // required by JPA
     }
 
     public UseCaseExtension(String conditionText, ExtensionKind kind, ExtensionExit extensionExit) {

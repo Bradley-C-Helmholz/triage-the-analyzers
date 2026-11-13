@@ -11,6 +11,7 @@ public class WeeklyPeerEvaluationReport {
 
 
     public WeeklyPeerEvaluationReport() {
+        // called by EvaluationService.generateWeeklyPeerEvaluationReportForSection, which fills the report through its setter and getter
     }
 
     public String getSectionName() {

@@ -5,6 +5,43 @@
        <!- - JPA entities share associations by design (reason ...) - ->
        <Match><Package name="~team\.projectpulse\..*"/><Bug pattern="EI_EXPOSE_REP"/></Match>
 
-     Unlike the baseline, this file may grow, but every entry is a reviewed decision. -->
+     Unlike the baseline, this file may grow, but every entry is a reviewed decision.
+
+     EI_EXPOSE_REP and EI_EXPOSE_REP2 are narrowed to the three groups below. SpotBugs has no
+     annotation matcher, so each group is an explicit, anchored class-name regex. The rules stay
+     enforced for every other class, including the plain classes PeerEvaluationAverage,
+     WeeklyPeerEvaluationReport, DocumentTemplate and MyUserPrincipal. -->
 <FindBugsFilter>
+    <!-- (a) JPA entities (every @Entity class in team.projectpulse).
+         Entities expose their associations by design. Callers mutate collections through getters:
+         Course.addInstructor/removeInstructor, Section.addInstructor/removeInstructor and
+         Team.addInstructor/removeInstructor (each changes instructor.getCourses(), getSections() or
+         getTeams()), TeamService.transferTeam/transferStudent (from/to getTeams() and getStudents()),
+         and UseCaseService.updateUseCase (clear() then addAll() on getSecondaryActors(),
+         getPreconditions() and getPostconditions()). Many collections also use orphanRemoval = true,
+         which requires Hibernate to see changes on the same managed collection instance. Defensive
+         copies would make those calls silently do nothing or break orphan removal. -->
+    <Match>
+        <Class name="~^team\.projectpulse\.(activity\.Activity|course\.Course|evaluation\.PeerEvaluation|evaluation\.Rating|instructor\.Instructor|ram\.collaboration\.Comment|ram\.collaboration\.CommentThread|ram\.document\.DocumentSection|ram\.document\.DocumentSectionLock|ram\.document\.RequirementDocument|ram\.requirement\.ArtifactKeySequence|ram\.requirement\.ArtifactLink|ram\.requirement\.RequirementArtifact|ram\.usecase\.UseCase|ram\.usecase\.UseCaseExtension|ram\.usecase\.UseCaseExtensionStep|ram\.usecase\.UseCaseLock|ram\.usecase\.UseCaseMainStep|rubric\.Criterion|rubric\.Rubric|section\.Section|student\.Student|team\.Team|user\.PeerEvaluationUser|user\.resetpassword\.ResetPasswordToken|user\.userinvitation\.UserInvitation)$"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!-- (b) DTO records: every class in a dto package, plus ReminderService.ReminderResult.
+         DTOs are records built per request for serialization (every class in a dto package is a
+         record) and are not held in a singleton, cache or static field, so they are not shared
+         across requests. -->
+    <Match>
+        <Class name="~^team\.projectpulse\.([a-z.]+\.)?dto\.[A-Za-z]+$|^team\.projectpulse\.notification\.ReminderService\$ReminderResult$"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!-- (c) Spring beans (@RestController, @Service, @Component): EI_EXPOSE_REP2 on constructors only.
+         These are constructor-injected singleton dependencies (the project uses constructor injection
+         only); sharing the injected reference is the intent of dependency injection and there is
+         nothing to copy. -->
+    <Match>
+        <Class name="~^team\.projectpulse\.(activity\.ActivityController|course\.CourseController|evaluation\.EvaluationController|instructor\.InstructorController|notification\.ReminderController|ram\.collaboration\.CommentController|ram\.requirement\.ArtifactLinkController|ram\.requirement\.RequirementArtifactController|rubric\.CriterionController|rubric\.RubricController|section\.SectionController|student\.StudentController|team\.TeamController|user\.UserController|instructor\.InstructorService|notification\.SubmissionStatusService|ram\.document\.DocumentSectionService|ram\.glossary\.GlossaryService|ram\.usecase\.UseCaseService|section\.SectionService|student\.StudentService|user\.UserService|user\.resetpassword\.ResetPasswordService|notification\.WeeklyReminderScheduler|seed\.DataInitializer)$"/>
+        <Method name="&lt;init&gt;"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
 </FindBugsFilter>

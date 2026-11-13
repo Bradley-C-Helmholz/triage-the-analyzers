@@ -60,6 +60,7 @@ public class CommentThread {
 
 
     public CommentThread() {
+        // required by JPA
     }
 
     public void addComment(Comment comment) {

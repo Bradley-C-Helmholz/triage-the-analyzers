@@ -22,6 +22,7 @@ public class Criterion {
 
 
     public Criterion() {
+        // required by JPA
     }
 
     public Criterion(String criterion, String description, Double maxScore) {
