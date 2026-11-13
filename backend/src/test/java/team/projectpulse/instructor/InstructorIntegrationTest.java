@@ -25,6 +25,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DisplayName("Integration tests for Instructor API endpoints")
 class InstructorIntegrationTest extends AbstractIntegrationTest {
@@ -361,6 +362,32 @@ class InstructorIntegrationTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.code").value(StatusCode.FORBIDDEN))
                 .andExpect(jsonPath("$.message").value("No permission."))
                 .andExpect(jsonPath("$.data").value("Access Denied"));
+    }
+
+    @Test
+    @DisplayName("Login by an instructor whose roles were cleared is rejected with 403, not a 500")
+    void loginWithNullRolesIsRejectedNot500() throws Exception {
+        // Given: an admin updates instructor Bill and leaves out "roles", which the DTO does not validate, so null is stored.
+        Map<String, Object> instructorDto = new HashMap<>();
+        instructorDto.put("username", "b.gates@abc.edu");
+        instructorDto.put("firstName", "Bill");
+        instructorDto.put("lastName", "Gates");
+        instructorDto.put("email", "b.gates@abc.edu");
+        instructorDto.put("enabled", true); // Keep the account enabled; a disabled account would be refused for another reason.
+        // No "roles" entry.
+        String json = this.jsonMapper.writeValueAsString(instructorDto);
+
+        this.mockMvc.perform(put(this.baseUrl + "/instructors/2").contentType(MediaType.APPLICATION_JSON).content(json).accept(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, this.adminBingyangToken))
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.data.roles").doesNotExist());
+
+        // When and then: Bill still passes HTTP Basic authentication, but has no role to log in with.
+        this.mockMvc.perform(post(this.baseUrl + "/users/login").with(httpBasic("b.gates@abc.edu", "123456")).accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.flag").value(false))
+                .andExpect(jsonPath("$.code").value(StatusCode.FORBIDDEN))
+                .andExpect(jsonPath("$.message").value("No permission."));
     }
 
 }
