@@ -53,6 +53,7 @@ public class RequirementDocument {
 
 
     public RequirementDocument() {
+        // required by JPA
     }
 
     public void addSection(DocumentSection section) {

@@ -16,6 +16,7 @@ public class ResetPasswordToken {
 
 
     public ResetPasswordToken() {
+        // required by JPA
     }
 
     public ResetPasswordToken(String email) {

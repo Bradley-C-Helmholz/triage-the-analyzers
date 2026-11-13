@@ -17,6 +17,7 @@ public class PeerEvaluationAverage {
 
 
     public PeerEvaluationAverage() {
+        // called by EvaluationService.getPeerEvaluationAverage, which fills the object through its setters
     }
 
     public Integer getStudentId() {

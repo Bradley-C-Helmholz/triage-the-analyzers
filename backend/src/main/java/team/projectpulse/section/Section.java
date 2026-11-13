@@ -52,6 +52,7 @@ public class Section {
 
 
     public Section() {
+        // required by JPA
     }
 
     public Section(String sectionName,

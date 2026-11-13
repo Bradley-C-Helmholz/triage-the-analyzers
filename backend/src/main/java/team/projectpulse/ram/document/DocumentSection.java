@@ -70,6 +70,7 @@ public class DocumentSection {
 
 
     public DocumentSection() {
+        // required by JPA
     }
 
     /* ---------- Convenience helpers ---------- */

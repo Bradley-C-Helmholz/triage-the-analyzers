@@ -16,6 +16,7 @@ public class Result {
 
 
     public Result() {
+        // no caller in this codebase (controllers use the argument constructors); kept as the bean default constructor beside the setters
     }
 
     public Result(boolean flag, Integer code, String message) {

@@ -7,6 +7,7 @@ public class RatingAverage {
 
 
     public RatingAverage() {
+        // no caller in this codebase (EvaluationService uses the two-argument constructor); kept as the bean default constructor beside the setters
     }
 
     public RatingAverage(Integer criterionId, Double averageScore) {
